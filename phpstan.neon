@@ -1,0 +1,20 @@
+parameters:
+    level: 8
+    paths:
+        - src
+    excludePaths:
+        - src/Laravel
+        - src/Symfony
+    ignoreErrors:
+        # Ignore reflection-based property access in tests
+        - '#Access to an undefined property ReflectionClass#'
+    reportUnmatchedIgnoredErrors: false
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
+
+    # Symfony compatibility
+    symfony:
+        console_application_loader: tests/symfony-console-application-loader.php
+
+    # Better error messages
+    treatPhpDocTypesAsCertain: true

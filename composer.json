@@ -1,0 +1,118 @@
+{
+    "name": "kra-connect/php-sdk",
+    "description": "Official PHP SDK for KRA GavaConnect API - Tax compliance and verification for Kenya",
+    "version": "0.1.0",
+    "type": "library",
+    "keywords": [
+        "kra",
+        "kenya-revenue-authority",
+        "gavaconnect",
+        "tax-compliance",
+        "pin-verification",
+        "tcc-verification",
+        "eslip-validation",
+        "nil-return",
+        "kenya",
+        "api-client",
+        "php",
+        "laravel",
+        "symfony"
+    ],
+    "homepage": "https://github.com/kra-connect/php-sdk",
+    "license": "MIT",
+    "readme": "README.md",
+    "authors": [
+        {
+            "name": "KRA-Connect Team",
+            "email": "support@kra-connect.dev",
+            "homepage": "https://kra-connect.dev"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/kra-connect/php-sdk/issues",
+        "source": "https://github.com/kra-connect/php-sdk",
+        "docs": "https://github.com/kra-connect/php-sdk/blob/main/README.md"
+    },
+    "require": {
+        "php": "^8.1|^8.2|^8.3",
+        "guzzlehttp/guzzle": "^7.8",
+        "symfony/cache": "^6.0|^7.0",
+        "psr/cache": "^3.0",
+        "psr/log": "^3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0|^11.0",
+        "phpstan/phpstan": "^1.10",
+        "vimeo/psalm": "^5.20",
+        "friendsofphp/php-cs-fixer": "^3.40",
+        "mockery/mockery": "^1.6",
+        "symfony/var-dumper": "^6.0|^7.0",
+        "illuminate/support": "^10.0|^11.0",
+        "symfony/http-kernel": "^6.0|^7.0"
+    },
+    "suggest": {
+        "illuminate/support": "Required for Laravel integration (^10.0|^11.0)",
+        "symfony/http-kernel": "Required for Symfony integration (^6.0|^7.0)"
+    },
+    "autoload": {
+        "psr-4": {
+            "KraConnect\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "KraConnect\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit --colors=always",
+        "test-coverage": "phpunit --coverage-html coverage --coverage-text",
+        "test-unit": "phpunit --testsuite Unit",
+        "test-integration": "phpunit --testsuite Integration",
+        "phpstan": "phpstan analyse --memory-limit=2G",
+        "psalm": "psalm --show-info=true",
+        "analyse": [
+            "@phpstan",
+            "@psalm"
+        ],
+        "cs-fix": "php-cs-fixer fix",
+        "cs-check": "php-cs-fixer fix --dry-run --diff",
+        "check": [
+            "@cs-check",
+            "@analyse",
+            "@test"
+        ]
+    },
+    "scripts-descriptions": {
+        "test": "Run all tests",
+        "test-coverage": "Run tests with coverage report",
+        "test-unit": "Run only unit tests",
+        "test-integration": "Run only integration tests",
+        "phpstan": "Run PHPStan static analysis",
+        "psalm": "Run Psalm static analysis",
+        "analyse": "Run all static analysis tools",
+        "cs-fix": "Fix code style issues",
+        "cs-check": "Check code style without fixing",
+        "check": "Run all checks (style, analysis, tests)"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "KraConnect\\Laravel\\KraConnectServiceProvider"
+            ],
+            "aliases": {
+                "KraConnect": "KraConnect\\Laravel\\KraConnectFacade"
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "preferred-install": "dist",
+        "optimize-autoloader": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
