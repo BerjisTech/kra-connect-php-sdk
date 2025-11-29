@@ -6,10 +6,12 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/kra-connect/php-sdk.svg?style=flat-square)](https://packagist.org/packages/kra-connect/php-sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![PHP Version](https://img.shields.io/packagist/php-v/kra-connect/php-sdk.svg?style=flat-square)](https://packagist.org/packages/kra-connect/php-sdk)
-[![Tests](https://img.shields.io/github/actions/workflow/status/kra-connect/php-sdk/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/kra-connect/php-sdk/actions)
-[![Code Coverage](https://img.shields.io/codecov/c/github/kra-connect/php-sdk?style=flat-square)](https://codecov.io/gh/kra-connect/php-sdk)
-[![PHPStan Level](https://img.shields.io/badge/PHPStan-level%208-brightgreen.svg?style=flat-square)](https://phpstan.org/)
-[![Psalm Level](https://img.shields.io/badge/Psalm-level%203-brightgreen.svg?style=flat-square)](https://psalm.dev/)
+
+## Repository
+
+- **GitHub**: [BerjisTech/kra-connect-php-sdk](https://github.com/BerjisTech/kra-connect-php-sdk)
+- **Packagist**: [kra-connect/php-sdk](https://packagist.org/packages/kra-connect/php-sdk)
+- **Documentation**: [https://docs.kra-connect.dev/php](https://docs.kra-connect.dev/php)
 
 ## Features
 
@@ -387,20 +389,47 @@ Run PHPStan for static analysis:
 composer phpstan
 ```
 
+## Publishing
+
+### Publishing to Packagist
+
+```bash
+# Update version in composer.json
+# Update CHANGELOG.md
+
+# Tag the release
+git tag -a v1.0.0 -m "Release version 1.0.0"
+git push origin v1.0.0
+
+# Packagist will automatically detect the new tag
+# Or manually update on https://packagist.org/packages/kra-connect/php-sdk
+```
+
+### GitHub Release
+
+```bash
+# Create GitHub release
+gh release create v1.0.0 --title "v1.0.0" --notes "Release notes here"
+```
+
 ## Contributing
 
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution guidelines.
+Contributions are welcome! Please:
+
+1. Fork the repository: [BerjisTech/kra-connect-php-sdk](https://github.com/BerjisTech/kra-connect-php-sdk)
+2. Create a feature branch
+3. Make your changes with tests
+4. Submit a pull request
 
 ## License
 
-MIT License - see [LICENSE](../../LICENSE) for details.
+MIT License - see [LICENSE](./LICENSE) for details.
 
 ## Support
 
 - **Documentation**: [https://docs.kra-connect.dev/php](https://docs.kra-connect.dev/php)
-- **Issues**: [GitHub Issues](https://github.com/your-org/kra-connect/issues)
-- **Discord**: [Join our community](https://discord.gg/kra-connect)
-- **Email**: support@kra-connect.dev
+- **Issues**: [GitHub Issues](https://github.com/BerjisTech/kra-connect-php-sdk/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/BerjisTech/kra-connect-php-sdk/discussions)
 
 ## Changelog
 
