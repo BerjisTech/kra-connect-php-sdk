@@ -1,7 +1,7 @@
 {
     "name": "kra-connect/php-sdk",
     "description": "Official PHP SDK for KRA GavaConnect API - Tax compliance and verification for Kenya",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "type": "library",
     "keywords": [
         "kra",
