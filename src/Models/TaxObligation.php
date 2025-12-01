@@ -105,7 +105,7 @@ class TaxObligation
      */
     public function hasEnded(): bool
     {
-        if (!$this->endDate) {
+        if ($this->endDate === null || $this->endDate === '') {
             return false;
         }
 
@@ -126,7 +126,7 @@ class TaxObligation
      */
     public function isFilingDueSoon(int $days = 7): bool
     {
-        if (!$this->nextFilingDate || !$this->isActive) {
+        if (($this->nextFilingDate === null || $this->nextFilingDate === '') || !$this->isActive) {
             return false;
         }
 
@@ -148,7 +148,7 @@ class TaxObligation
      */
     public function isFilingOverdue(): bool
     {
-        if (!$this->nextFilingDate || !$this->isActive) {
+        if (($this->nextFilingDate === null || $this->nextFilingDate === '') || !$this->isActive) {
             return false;
         }
 
@@ -168,7 +168,7 @@ class TaxObligation
      */
     public function getDaysUntilFiling(): ?int
     {
-        if (!$this->nextFilingDate) {
+        if ($this->nextFilingDate === null || $this->nextFilingDate === '') {
             return null;
         }
 
@@ -176,8 +176,13 @@ class TaxObligation
             $filingDateTime = new \DateTime($this->nextFilingDate);
             $now = new \DateTime();
             $interval = $now->diff($filingDateTime);
+            $days = $interval->days;
 
-            return $interval->invert ? -$interval->days : $interval->days;
+            if ($days === false) {
+                return null;
+            }
+
+            return $interval->invert ? -$days : $days;
         } catch (\Exception $e) {
             return null;
         }

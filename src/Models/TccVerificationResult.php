@@ -115,7 +115,7 @@ class TccVerificationResult
      */
     public function getDaysUntilExpiry(): ?int
     {
-        if (!$this->expiryDate) {
+        if ($this->expiryDate === null || $this->expiryDate === '') {
             return null;
         }
 
@@ -123,8 +123,13 @@ class TccVerificationResult
             $expiryDateTime = new \DateTime($this->expiryDate);
             $now = new \DateTime();
             $interval = $now->diff($expiryDateTime);
+            $days = $interval->days;
 
-            return $interval->invert ? -$interval->days : $interval->days;
+            if ($days === false) {
+                return null;
+            }
+
+            return $interval->invert ? -$days : $days;
         } catch (\Exception $e) {
             return null;
         }

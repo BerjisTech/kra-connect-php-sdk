@@ -25,9 +25,16 @@ class ValidatorTest extends TestCase
             '  P051234567A  ', // Whitespace should be trimmed
         ];
 
-        foreach ($validPins as $pin) {
+        $expected = [
+            'P051234567A',
+            'P051234567B',
+            'P051234567A',
+            'P051234567A',
+        ];
+
+        foreach ($validPins as $index => $pin) {
             $result = Validator::validatePin($pin);
-            $this->assertSame('P051234567A', $result);
+            $this->assertSame($expected[$index], $result);
         }
     }
 

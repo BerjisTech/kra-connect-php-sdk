@@ -23,7 +23,7 @@ class FormatterTest extends TestCase
 
     public function testMaskApiKey(): void
     {
-        $this->assertSame('sk_l***************cdef', Formatter::maskApiKey('sk_live_1234567890abcdef'));
+        $this->assertSame('sk_l****************cdef', Formatter::maskApiKey('sk_live_1234567890abcdef'));
     }
 
     public function testFormatCurrency(): void
@@ -75,7 +75,7 @@ class FormatterTest extends TestCase
     {
         $this->assertSame('This is...', Formatter::truncate('This is a long text', 10));
         $this->assertSame('Short', Formatter::truncate('Short', 10));
-        $this->assertSame('This---', Formatter::truncate('This is a long text', 10, '---'));
+        $this->assertSame('This is---', Formatter::truncate('This is a long text', 10, '---'));
     }
 
     public function testSnakeToTitle(): void

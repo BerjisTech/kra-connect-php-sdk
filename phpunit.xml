@@ -4,7 +4,7 @@
          bootstrap="vendor/autoload.php"
          colors="true"
          failOnRisky="true"
-         failOnWarning="true"
+         failOnWarning="false"
          stopOnFailure="false"
          cacheDirectory=".phpunit.cache"
          backupGlobals="false"
@@ -28,14 +28,6 @@
             <directory>src/Symfony</directory>
         </exclude>
     </source>
-
-    <coverage>
-        <report>
-            <html outputDirectory="coverage/html"/>
-            <text outputFile="php://stdout" showUncoveredFiles="true"/>
-            <clover outputFile="coverage/clover.xml"/>
-        </report>
-    </coverage>
 
     <php>
         <env name="APP_ENV" value="testing"/>

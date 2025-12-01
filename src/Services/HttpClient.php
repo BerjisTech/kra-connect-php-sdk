@@ -141,6 +141,7 @@ class HttpClient
             return $this->parseResponse($response, $endpoint);
         } catch (RequestException $e) {
             $this->handleRequestException($e, $endpoint);
+            throw $e;
         } catch (GuzzleException $e) {
             throw ApiException::networkError($endpoint, $e->getMessage());
         }
@@ -187,7 +188,12 @@ class HttpClient
     private function handleRequestException(RequestException $exception, string $endpoint): void
     {
         // Check for timeout
-        if ($exception->getHandlerContext()['errno'] ?? null === CURLE_OPERATION_TIMEDOUT) {
+        $errno = $exception->getHandlerContext()['errno'] ?? null;
+        if (
+            $errno !== null
+            && defined('CURLE_OPERATION_TIMEDOUT')
+            && $errno === CURLE_OPERATION_TIMEDOUT
+        ) {
             throw new ApiTimeoutException($endpoint, $this->config->timeout);
         }
 

@@ -83,9 +83,36 @@ class KraConfigTest extends TestCase
 
     public function testFromEnvWithMissingApiKeyThrowsException(): void
     {
+        $originalEnv = $_ENV['KRA_API_KEY'] ?? null;
+        $originalServer = $_SERVER['KRA_API_KEY'] ?? null;
+        $originalGetEnv = getenv('KRA_API_KEY');
+
+        unset($_ENV['KRA_API_KEY'], $_SERVER['KRA_API_KEY']);
+        putenv('KRA_API_KEY');
+
         $this->expectException(\InvalidArgumentException::class);
 
-        KraConfig::fromEnv();
+        try {
+            KraConfig::fromEnv();
+        } finally {
+            if ($originalEnv !== null) {
+                $_ENV['KRA_API_KEY'] = $originalEnv;
+            } else {
+                unset($_ENV['KRA_API_KEY']);
+            }
+
+            if ($originalServer !== null) {
+                $_SERVER['KRA_API_KEY'] = $originalServer;
+            } else {
+                unset($_SERVER['KRA_API_KEY']);
+            }
+
+            if ($originalGetEnv !== false) {
+                putenv("KRA_API_KEY={$originalGetEnv}");
+            } else {
+                putenv('KRA_API_KEY');
+            }
+        }
     }
 
     public function testGetHeaders(): void

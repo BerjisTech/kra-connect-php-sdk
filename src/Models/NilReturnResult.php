@@ -135,7 +135,7 @@ class NilReturnResult
      */
     public function getTaxYear(): ?int
     {
-        if (!$this->period || strlen($this->period) < 4) {
+        if ($this->period === null || $this->period === '' || strlen($this->period) < 4) {
             return null;
         }
 
@@ -149,7 +149,7 @@ class NilReturnResult
      */
     public function getTaxMonth(): ?int
     {
-        if (!$this->period || strlen($this->period) < 6) {
+        if ($this->period === null || $this->period === '' || strlen($this->period) < 6) {
             return null;
         }
 
@@ -170,7 +170,13 @@ class NilReturnResult
             return $this->period;
         }
 
-        $monthName = date('F', mktime(0, 0, 0, $month, 1));
+        /** @var int|false $timestamp */
+        $timestamp = mktime(0, 0, 0, $month, 1);
+        if ($timestamp === false) {
+            return $this->period;
+        }
+
+        $monthName = date('F', $timestamp);
         return sprintf('%s %d', $monthName, $year);
     }
 }

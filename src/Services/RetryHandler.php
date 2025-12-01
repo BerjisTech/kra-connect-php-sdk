@@ -115,7 +115,10 @@ class RetryHandler
      */
     private function sleep(float $seconds): void
     {
-        usleep((int) ($seconds * 1000000));
+        $microseconds = (int) max(0, round($seconds * 1000000));
+        if ($microseconds > 0) {
+            usleep($microseconds);
+        }
     }
 
     /**

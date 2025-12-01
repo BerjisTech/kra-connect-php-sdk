@@ -33,9 +33,8 @@ class CacheManager
     /**
      * Get a value from the cache.
      *
-     * @template T
      * @param string $key The cache key
-     * @return T|null The cached value, or null if not found or expired
+     * @return mixed|null The cached value, or null if not found or expired
      */
     public function get(string $key)
     {
@@ -97,11 +96,10 @@ class CacheManager
     /**
      * Get a value from cache, or generate and cache it if not found.
      *
-     * @template T
      * @param string $key The cache key
-     * @param callable(): T $factoryFn Function to generate the value if not cached
+     * @param callable $factoryFn Function to generate the value if not cached
      * @param int|null $ttl Time-to-live in seconds
-     * @return T The cached or generated value
+     * @return mixed The cached or generated value
      */
     public function getOrSet(string $key, callable $factoryFn, ?int $ttl = null)
     {

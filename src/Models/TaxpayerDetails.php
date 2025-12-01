@@ -157,7 +157,7 @@ class TaxpayerDetails
     {
         return array_filter(
             $this->obligations,
-            fn($obligation) => strtolower($obligation->obligationType ?? '') === strtolower($obligationType)
+            fn(TaxObligation $obligation) => strtolower($obligation->obligationType) === strtolower($obligationType)
         );
     }
 

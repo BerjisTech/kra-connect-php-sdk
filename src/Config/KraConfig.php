@@ -55,22 +55,35 @@ class KraConfig
      */
     public static function fromEnv(array $overrides = []): self
     {
-        $apiKey = $overrides['apiKey'] ?? $_ENV['KRA_API_KEY'] ?? getenv('KRA_API_KEY');
+        $envApiKey = $_ENV['KRA_API_KEY'] ?? getenv('KRA_API_KEY');
+        $apiKey = $overrides['apiKey'] ?? (is_string($envApiKey) ? $envApiKey : null);
 
-        if (!$apiKey || !is_string($apiKey)) {
+        if (!is_string($apiKey) || $apiKey === '') {
             throw new \InvalidArgumentException(
                 'API key is required. Set KRA_API_KEY environment variable or pass apiKey in overrides.'
             );
         }
 
+        $envBaseUrl = $_ENV['KRA_BASE_URL'] ?? getenv('KRA_BASE_URL');
+        $baseUrl = $overrides['baseUrl']
+            ?? (is_string($envBaseUrl) && $envBaseUrl !== '' ? $envBaseUrl : 'https://api.kra.go.ke/gavaconnect/v1');
+
+        $envTimeout = $_ENV['KRA_TIMEOUT'] ?? getenv('KRA_TIMEOUT');
+        $timeout = $overrides['timeout']
+            ?? (is_string($envTimeout) && $envTimeout !== '' ? (float) $envTimeout : 30.0);
+
+        $envDebug = $_ENV['KRA_DEBUG'] ?? getenv('KRA_DEBUG');
+        $debug = $overrides['debug']
+            ?? (is_string($envDebug) && $envDebug !== '' ? filter_var($envDebug, FILTER_VALIDATE_BOOL) : false);
+
         return new self(
             apiKey: $apiKey,
-            baseUrl: $overrides['baseUrl'] ?? $_ENV['KRA_BASE_URL'] ?? getenv('KRA_BASE_URL') ?: 'https://api.kra.go.ke/gavaconnect/v1',
-            timeout: (float) ($overrides['timeout'] ?? $_ENV['KRA_TIMEOUT'] ?? getenv('KRA_TIMEOUT') ?: 30.0),
+            baseUrl: $baseUrl,
+            timeout: (float) $timeout,
             retryConfig: $overrides['retryConfig'] ?? new RetryConfig(),
             cacheConfig: $overrides['cacheConfig'] ?? new CacheConfig(),
             rateLimitConfig: $overrides['rateLimitConfig'] ?? new RateLimitConfig(),
-            debug: (bool) ($overrides['debug'] ?? $_ENV['KRA_DEBUG'] ?? getenv('KRA_DEBUG') ?: false),
+            debug: (bool) $debug,
             userAgent: $overrides['userAgent'] ?? null,
             additionalHeaders: $overrides['additionalHeaders'] ?? []
         );

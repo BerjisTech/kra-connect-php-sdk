@@ -206,8 +206,9 @@ class Formatter
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
         $bytes = max($bytes, 0);
-        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = (int) floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow = min($pow, count($units) - 1);
+        $pow = max(0, $pow);
 
         $bytes /= (1 << (10 * $pow));
 
@@ -244,10 +245,10 @@ class Formatter
     public static function formatPhoneNumber(string $phoneNumber, string $countryCode = '+254'): string
     {
         // Remove all non-digit characters
-        $cleaned = preg_replace('/\D/', '', $phoneNumber);
+        $cleaned = preg_replace('/\D/', '', $phoneNumber) ?? '';
 
         // Remove leading zero if present
-        if (substr($cleaned, 0, 1) === '0') {
+        if ($cleaned !== '' && substr($cleaned, 0, 1) === '0') {
             $cleaned = substr($cleaned, 1);
         }
 
@@ -301,6 +302,9 @@ class Formatter
     public static function camelToTitle(string $text): string
     {
         $spaced = preg_replace('/([a-z])([A-Z])/', '$1 $2', $text);
+        if ($spaced === null) {
+            $spaced = $text;
+        }
         return ucwords($spaced);
     }
 
