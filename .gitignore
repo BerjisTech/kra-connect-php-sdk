@@ -1,0 +1,9 @@
+vendor/
+.phpunit.cache/
+.php-cs-fixer.cache
+coverage/
+.idea/
+.DS_Store
+composer.lock.bak
+node_modules/
+*.log
