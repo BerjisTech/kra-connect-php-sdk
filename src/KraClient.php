@@ -91,9 +91,9 @@ class KraClient
                 // Acquire rate limit token
                 $this->rateLimiter->acquire();
 
-                // Make API request
-                $responseData = $this->httpClient->post('/verify-pin', [
-                    'pin' => $normalizedPin
+                // Make API request to GavaConnect endpoint
+                $responseData = $this->httpClient->post('/checker/v1/pinbypin', [
+                    'KRAPIN' => $normalizedPin
                 ]);
 
                 // Parse and return result
@@ -107,37 +107,42 @@ class KraClient
      * Verify a Tax Compliance Certificate (TCC).
      *
      * @param string $tccNumber The TCC number to verify (format: TCC123456)
+     * @param string $kraPIN The taxpayer's KRA PIN associated with the TCC
      * @return TccVerificationResult The verification result
      * @throws \KraConnect\Exceptions\InvalidTccFormatException If TCC format is invalid
+     * @throws \KraConnect\Exceptions\InvalidPinFormatException If PIN format is invalid
      * @throws \KraConnect\Exceptions\ApiException If API request fails
      *
      * @example
      * ```php
-     * $result = $client->verifyTcc('TCC123456');
+     * $result = $client->verifyTcc('TCC123456', 'P051234567A');
      *
      * if ($result->isCurrentlyValid()) {
      *     echo "TCC is valid until: " . $result->expiryDate;
      * }
      * ```
      */
-    public function verifyTcc(string $tccNumber): TccVerificationResult
+    public function verifyTcc(string $tccNumber, string $kraPIN): TccVerificationResult
     {
-        // Validate and normalize TCC
+        // Validate and normalize TCC and PIN
         $normalizedTcc = Validator::validateTcc($tccNumber);
+        $normalizedPin = Validator::validatePin($kraPIN);
 
         // Generate cache key
         $cacheKey = $this->cacheManager->generateKey('tcc_verification', [
-            'tcc' => $normalizedTcc
+            'tcc' => $normalizedTcc,
+            'pin' => $normalizedPin
         ]);
 
         // Try to get from cache
         return $this->cacheManager->getOrSet(
             $cacheKey,
-            function () use ($normalizedTcc) {
+            function () use ($normalizedTcc, $normalizedPin) {
                 $this->rateLimiter->acquire();
 
-                $responseData = $this->httpClient->post('/verify-tcc', [
-                    'tcc' => $normalizedTcc
+                $responseData = $this->httpClient->post('/v1/kra-tcc/validate', [
+                    'kraPIN' => $normalizedPin,
+                    'tccNumber' => $normalizedTcc
                 ]);
 
                 return TccVerificationResult::fromApiResponse($responseData);
@@ -179,8 +184,8 @@ class KraClient
             function () use ($normalizedEslip) {
                 $this->rateLimiter->acquire();
 
-                $responseData = $this->httpClient->post('/validate-eslip', [
-                    'eslip_number' => $normalizedEslip
+                $responseData = $this->httpClient->post('/payment/checker/v1/eslip', [
+                    'EslipNumber' => $normalizedEslip
                 ]);
 
                 return EslipValidationResult::fromApiResponse($responseData);
@@ -193,8 +198,9 @@ class KraClient
      * File a NIL return for a specific tax obligation.
      *
      * @param string $pinNumber The taxpayer's PIN number
-     * @param string $obligationId The obligation ID
-     * @param string $period The tax period (YYYYMM format, e.g., '202401')
+     * @param int $obligationCode The obligation code as defined by KRA
+     * @param int $month The tax period month (1-12)
+     * @param int $year The tax period year
      * @return NilReturnResult The filing result
      * @throws \KraConnect\Exceptions\InvalidPinFormatException If PIN format is invalid
      * @throws \KraConnect\Exceptions\ValidationException If parameters are invalid
@@ -202,27 +208,38 @@ class KraClient
      *
      * @example
      * ```php
-     * $result = $client->fileNilReturn('P051234567A', 'OBL123', '202401');
+     * $result = $client->fileNilReturn('P051234567A', 1, 1, 2024);
      *
      * if ($result->isAccepted()) {
      *     echo "NIL return filed: " . $result->referenceNumber;
      * }
      * ```
      */
-    public function fileNilReturn(string $pinNumber, string $obligationId, string $period): NilReturnResult
+    public function fileNilReturn(string $pinNumber, int $obligationCode, int $month, int $year): NilReturnResult
     {
         // Validate inputs
         $normalizedPin = Validator::validatePin($pinNumber);
-        $normalizedObligationId = Validator::validateObligationId($obligationId);
-        $normalizedPeriod = Validator::validatePeriod($period);
+
+        if ($obligationCode <= 0) {
+            throw new \KraConnect\Exceptions\ValidationException('Obligation code must be a positive integer');
+        }
+        if ($month < 1 || $month > 12) {
+            throw new \KraConnect\Exceptions\ValidationException('Month must be between 1 and 12');
+        }
+        if ($year < 2000) {
+            throw new \KraConnect\Exceptions\ValidationException('Year must be 2000 or later');
+        }
 
         // Note: NIL returns are not cached as they are create operations
         $this->rateLimiter->acquire();
 
-        $responseData = $this->httpClient->post('/file-nil-return', [
-            'pin' => $normalizedPin,
-            'obligation_id' => $normalizedObligationId,
-            'period' => $normalizedPeriod
+        $responseData = $this->httpClient->post('/dtd/return/v1/nil', [
+            'TAXPAYERDETAILS' => [
+                'TaxpayerPIN' => $normalizedPin,
+                'ObligationCode' => $obligationCode,
+                'Month' => $month,
+                'Year' => $year,
+            ]
         ]);
 
         return NilReturnResult::fromApiResponse($responseData);
@@ -261,8 +278,18 @@ class KraClient
             function () use ($normalizedPin) {
                 $this->rateLimiter->acquire();
 
-                $responseData = $this->httpClient->get('/taxpayer-details', [
-                    'pin' => $normalizedPin
+                // Make API requests to GavaConnect endpoints (profile + obligations)
+                $profileData = $this->httpClient->post('/checker/v1/pinbypin', [
+                    'KRAPIN' => $normalizedPin
+                ]);
+
+                $obligationsData = $this->httpClient->post('/dtd/checker/v1/obligation', [
+                    'taxPayerPin' => $normalizedPin
+                ]);
+
+                // Combine profile and obligations data
+                $responseData = array_merge($profileData, [
+                    'obligations' => $obligationsData['obligations'] ?? []
                 ]);
 
                 return TaxpayerDetails::fromApiResponse($responseData);
